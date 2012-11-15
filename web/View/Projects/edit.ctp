@@ -6,7 +6,8 @@
 		if (isset($this->request->data['Project']['id']))
 			echo $this->Form->input('id');
 		echo $this->Form->input('name');
-		echo $this->Form->input('client_id');?>
+		echo $this->Form->input('client_id');
+		echo $this->Form->input('data', array('type' => 'date'));?>
 		<div class="actions">
 			<ul>
 				<li><?php echo $this->Html->link(__('New Client'), array('controller' => 'clients', 'action' => 'add'), array('target' => 'blank'));?></li>

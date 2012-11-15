@@ -89,6 +89,18 @@ $quoteColor= array(1 => 'red', 2 => 'red', 3 => 'yellow', 4 => 'green');
 Configure::write('quoteStatus', $quoteStatus);
 Configure::write('quoteColor', $quoteColor);
 
+$ddtStatus = array(1 => 'Non consegnato', 2 => 'DDT non confermati', 3 => 'Consegnato');
+$ddtColor= array(1 => 'red', 2 => 'yellow', 3 => 'green');
+
+Configure::write('ddtStatus', $ddtStatus);
+Configure::write('ddtColor', $ddtColor);
+
+$invoiceStatus = array(1 => 'Non fatturare', 2 => 'Da Fatturare', 3=> 'Parzialmente fatturato', 4 => 'Fatturato');
+$invoiceColor= array(1 => 'red', 2 => 'blue', 3 => 'yellow', 4 => 'green');
+
+Configure::write('invoiceStatus', $invoiceStatus);
+Configure::write('invoiceColor', $invoiceColor);
+
 $addressType=array("Sede Legale", "Sede Operativa", "Altro indirizzo");
 $addressType=array_combine($addressType,$addressType);
 Configure::write('addressType', $addressType);

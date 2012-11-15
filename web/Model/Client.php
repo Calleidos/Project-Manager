@@ -52,6 +52,10 @@ class Client extends AppModel {
 				//'on' => 'create', // Limit validation to 'create' or 'update' operations
 			),
 		),
+		'paymenttype_id' => array(
+				'rule' => array('notZero'),
+				'message' => 'Devi scegliere la forma di pagamento'
+		),
 	);
 
 	//The Associations below have been created with all possible keys, those that are not needed can be removed
@@ -142,5 +146,13 @@ class Client extends AppModel {
 			'counterQuery' => ''
 		)
 	);
+	
+		var $belongsTo = array(
+			'PaymentType' => array(
+				'className'    => 'PaymentType',
+				'foreignKey'    => 'paymenttype_id'
+			)
+		);
+
 
 }

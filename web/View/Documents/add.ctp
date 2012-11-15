@@ -20,6 +20,7 @@
 	<fieldset>
 		<legend><?php echo __('Add Document'); ?></legend><?php
 		echo $this->Form->input('Document.name');
+		echo $this->Form->input('Document.data', array('type' => 'datetime'));
 		echo $this->Form->input('Document.project_id', array('value'=>$project_id, 'type' =>"hidden"));
 		echo $this->Form->input('Document.tipologia', array('type'=>'select', 'options'=>Configure::read("tipologiaDocumento")));
 		echo $this->Form->input('Document.fileName', array('type' => 'file'));

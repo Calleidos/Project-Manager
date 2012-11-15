@@ -16,7 +16,13 @@
 		echo $this->Form->input('address', array('options'=>$addresses));
 		echo $this->Form->input('client_referent_id', array('options'=>$referenti));
 		echo $this->Form->input('iva', array('options'=>Configure::read('iva')));
-		echo $this->Form->input('pagamento', array('options'=>Configure::read('tipiDiPagamento')));
+		$tipiDiPagamento=$this->requestAction(array('controller' => 'paymenttypes', 'action' => 'listTypes'));
+		array_unshift($tipiDiPagamento, "");
+		if (isset($this->request->data['Quote']['pagamento']))
+			$default=$this->request->data['Quote']['pagamento'];
+		else
+			$default=$paymentDefault;
+		echo $this->Form->input('pagamento', array('options'=>$tipiDiPagamento, 'selected' => $default));
 		echo $this->Form->input('consegna');
 		echo $this->Form->input('email', array("type" => "select", "options" => $email));
 		if (isset($articles) && !empty($articles)) {?>
@@ -30,7 +36,7 @@
 			$i=0;
 			foreach ($articles as $article) {?>
 				<tr>
-					<td><?php echo $this->Form->input("DocumentLine.$i.includi", array('type'=>'checkbox', 'label' => false, 'disabled' => !$article['Article']['status'])); ?></td>
+					<td><?php echo $this->Form->input("DocumentLine.$i.includi", array('type'=>'checkbox', 'label' => false, 'disabled' => !$article['Article']['status'], 'value' => ($this->request->data['Document']))); ?></td>
 					<td <?php if (!$article['Article']['status']) echo "style='color:grey;' "?>><?php echo $article['Article']['description'] ?><?php echo $this->Form->input("DocumentLine.$i.article_id", array('type'=>'hidden', 'value' => $article['Article']['id']))?> <?php if (!$article['Article']['status']) echo "<i>(Articolo disabilitato)</i>"?></td>
 					<td><?php echo $this->Form->input("DocumentLine.$i.prezzo", array('label' => false, 'disabled' => !$article['Article']['status'])); ?></td>
 					<td><?php echo $this->Form->input("DocumentLine.$i.quantita", array('label' => false, 'disabled' => !$article['Article']['status'])); ?></td>

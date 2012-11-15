@@ -8,6 +8,7 @@
 		echo $this->Form->input('ragione_sociale');
 		echo $this->Form->input('codice_fiscale');
 		echo $this->Form->input('partita_iva');
+		echo $this->Form->input("paymenttype_id", array('options' => $paymenttype));
 	?>
 	</fieldset>
 <?php echo $this->Form->end(__('Submit'));?>
@@ -17,6 +18,5 @@
 	<ul><?php 
 		if (isset($this->request->data['Client']['id'])) { ?>	
 		<li><?php echo $this->Html->link(__('Back to Client'), array('action' => 'view', $this->request->data['Client']['id']));?></li><?php } ?>
-		<li><?php echo $this->Form->postLink(__('Delete'), array('action' => 'delete', $this->Form->value('Client.id')), null, __('Are you sure you want to delete # %s?', $this->Form->value('Client.id'))); ?></li>
 	</ul>
 </div>

@@ -7,6 +7,7 @@
                 <th><strong><?php echo __('Name'); ?></strong></th>
 				<th><strong><?php echo __('Type'); ?></strong></th>
                 <th><strong><?php echo __('Details'); ?></strong></th>
+                <th><strong><?php echo __('Data'); ?></strong></th>
                 <th><strong><?php echo __('File Link'); ?></strong></th>
 			</tr><?php 
 			if (!empty($project[ucwords($details['type'])])) {

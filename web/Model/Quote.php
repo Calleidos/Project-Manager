@@ -61,6 +61,11 @@ class Quote extends AppModel {
 		)
 	);
 	
-	
+	var $validate = array(
+		'pagamento' => array(
+			'rule' => array("notZero"),
+			'message' => 'Devi scegliere la forma di pagamento'
+		),
+	);
 	
 }

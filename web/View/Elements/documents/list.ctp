@@ -19,6 +19,9 @@
 		<?php echo $element['description'] ?>
 	</td>
 	<td>
+		<?php echo $element['data'] ?>
+	</td>
+	<td>
 		<button onClick="window.open('<?php echo $element['uploadPath'] ?>'); return false;" class="open-file"><?php echo __("View Document"); ?></button>
 	</td>
 </tr>

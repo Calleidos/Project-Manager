@@ -31,4 +31,12 @@ App::uses('Model', 'Model');
  * @package       app.Model
  */
 class AppModel extends Model {
+	
+	function notZero($value){
+		$value= reset($value);
+		return ($value<>"0");
+	}
+		
+	
+	
 }

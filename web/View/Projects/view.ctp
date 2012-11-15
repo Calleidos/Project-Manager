@@ -1,5 +1,5 @@
 <?php
-	//pr($project);
+	pr($project);
 	$this->element("fancybox_links");
 	$this->Html->css('datetimepicker', null, array('inline' => false));
 	$this->Html->script("/js/functions.js", array('inline' => false));
@@ -45,6 +45,13 @@
 			<?php echo h($project['Project']['id']); ?>
 			&nbsp;
 		</dd>
+		
+		<dt><?php echo __('Data'); ?></dt>
+		<dd>
+			<?php echo h($project['Project']['data']); ?>
+			&nbsp;
+		</dd>
+		
 		<dt><?php echo __('Name'); ?></dt>
 		<dd>
 			<?php echo h($project['Project']['name']); ?>
@@ -60,6 +67,25 @@
 				echo h($quoteStatus[$project['Project']['quote_status']]); ?>
 			&nbsp;
 		</dd>
+		<dt><?php echo __('DDT Status'); ?></dt>
+		<?php 
+			$ddtStatus=Configure::read('ddtStatus');
+			$ddtColor=Configure::read('ddtColor');
+		?>
+		<dd style="background:<?php echo h($ddtColor[$project['Project']['ddt_status']]); ?>;<?php if ($ddtColor[$project['Project']['ddt_status']]<>'yellow') echo "color:white"; ?>"><?php
+			
+				echo h($ddtStatus[$project['Project']['ddt_status']]); ?>
+			&nbsp;
+		</dd>
+		<dt><?php echo __('Invoice Status'); ?></dt>
+		<?php 
+			$invoiceStatus=Configure::read('invoiceStatus');
+			$invoiceColor=Configure::read('invoiceColor');
+		?>
+		<dd style="background:<?php echo h($invoiceColor[$project['Project']['invoice_status']]); ?>;<?php if ($invoiceColor[$project['Project']['invoice_status']]<>'yellow') echo "color:white"; ?>"><?php
+			
+				echo h($invoiceStatus[$project['Project']['invoice_status']]); ?>
+		</dd>
 		<dt><?php echo __('Balance'); ?></dt>
 		<dd>
 			<?php echo h($project['Project']['balance']); ?>
@@ -70,11 +96,11 @@
 <div class="actions">
 	<h3><?php echo __('Actions'); ?></h3>
 	<ul>
+		<li><?php echo $this->Html->link(__('Cambia Stato Consegna'), array('action' => 'status', $project['Project']['id'], 'ddt_status' )); ?> </li>
+		<li><?php echo $this->Html->link(__('Cambia Stato Fatturazione'), array('action' => 'status', $project['Project']['id'], 'invoice_status' )); ?> </li>
 		<li><?php echo $this->Html->link(__('Edit Project'), array('action' => 'edit', $project['Project']['id'])); ?> </li>
-		<li><?php echo $this->Form->postLink(__('Delete Project'), array('action' => 'delete', $project['Project']['id']), null, __('Are you sure you want to delete # %s?', $project['Project']['id'])); ?> </li>
 		<li><?php echo $this->Html->link(__('List Projects'), array('action' => 'index')); ?> </li>
 		<li><?php echo $this->Html->link(__('New Project'), array('action' => 'add')); ?> </li>
-		<li><?php echo $this->Html->link(__('New Quote'), array('controller'=>'quotes', 'action' => 'add', $project['Project']['id'])); ?></li>
 		<li><?php echo $this->Html->link(__('Project Roles'), array('controller'=>'projects', 'action' => 'roles', $project['Project']['id'])); ?></li>
 	</ul>
 </div>

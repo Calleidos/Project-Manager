@@ -207,6 +207,11 @@ class QuotesController extends AppController {
 		$creators = $this->Quote->Creator->find('list');
 		$modifiers = $this->Quote->Modifier->find('list');
 		$this->set(compact('creators', 'modifiers'));
+		$paymentType=$this->Quote->Project->Client->PaymentType->find('list', array('fields' => array('id', 'type')));
+		array_unshift($paymentType, "");
+		
+		$this->set("paymenttype", $paymentType);
+		$this->set("paymentDefault", $client['Client']['paymenttype_id']);
 		$this->render('edit');
 	}
 
@@ -285,8 +290,137 @@ class QuotesController extends AppController {
 		$creators = $this->Quote->Creator->find('list');
 		$modifiers = $this->Quote->Modifier->find('list');
 		$this->set(compact('creators', 'modifiers'));
+		$paymentType=$this->Quote->Project->Client->PaymentType->find('list', array('fields' => array('id', 'type')));
+		array_unshift($paymentType, "");
+		
+		$this->set("paymenttype", $paymentType);
+		$this->set("paymentDefault", $client['Client']['paymenttype_id']);
 	}
 
+	/**
+	 * edit method
+	 *
+	 * @param string $id
+	 * @return void
+	 */
+	public function copyEdit($id = null) {
+		if ($this->request->is('post')) {
+			$save=false;
+			foreach($this->request->data['DocumentLine'] as $dl){
+				pr($dl);
+				if (isset($dl['includi']) && $dl['includi']==1)
+					$save=true;
+			}
+			if (!$save)
+				$this->Session->setFlash(__('You must include at least one article'));
+			else {
+				foreach($this->request->data['DocumentLine'] as $dl) {
+					if ($dl['includi']==1 && ( trim($dl['quantita']=="" || $dl['quantita']==0 ) )) {
+						$save=false;
+					}
+				}
+				if (!$save) {
+					$this->Session->setFlash(__('Devi indicare un prezzo e una quantita\' per ogni elemento selezionato'));
+				} else {
+					if (in_array($this->request->data['Quote']['pagamento'], array("RiBa 30", "RiBa 60", "RiBa 90"))) {
+						$project=$this->Quote->Project->read(null, $this->request->data['Quote']['project_id']);
+						$client=$this->Quote->Project->Client->read(null, $project['Project']['client_id']);
+						if (empty($client['BankDetail'])) {
+							$this->Session->setFlash(__('You can\'t create a RiBa payment in you haven\'t inserted bank details for the client'));
+							$save=false;
+						}
+					}
+					if ($save) {
+						$this->Quote->create();
+						if ($this->Quote->save($this->request->data)) {
+							$quoteId=$this->Quote->id;
+							$totale=0;
+							foreach ($this->request->data['DocumentLine'] as $dl) {
+								if ($dl['includi']) {
+									$dl['foreign_id']=$quoteId;
+									$dl['foreign_model']="Quote";
+									$this->Quote->DocumentLine->create();
+									$this->Quote->DocumentLine->save($dl);
+									$totale+=$dl['prezzo'];
+								}
+							}
+							$data['Quote']['id']=$quoteId;
+							$data['Quote']['totale']=$totale;
+							$this->Quote->save($data);
+							$this->checkProjectQuoteStatus($project_id);
+							$this->Session->setFlash(__('The quote has been saved'));
+							$this->redirect(array('action' => 'view', $quoteId));
+						} else {
+							$this->Session->setFlash(__('The quote could not be saved. Please, try again.'));
+						}
+					}
+				}
+			}
+		} else {
+			$this->request->data=$this->Quote->read(null, $id);
+			$project_id=$this->request->data['Quote']['project_id'];
+		}
+		if (isset($project_id)) {
+			$articles=$this->Quote->DocumentLine->Article->find('all', array('conditions'=>array('Article.project_id'=>$project_id)));
+			$this->set('articles', $articles);
+			$this->set("project_id", $project_id);
+		} else {
+			$project_id=$this->request->data['Quote']['project_id'];
+		}
+		
+		$this->loadModel("Client");
+		$this->loadModel("Project");
+		$project=$this->Project->read(null, $project_id);
+		$client=$this->Client->read(null, $project['Project']['client_id']);
+		$email=$client['Email'];
+		if (isset($client['ClientReferent']) && !empty($client['ClientReferent'])) {
+			foreach ($client['ClientReferent'] as $cr)
+				$ids[]=$cr['id'];
+		}
+		$clientReferents=$this->Project->Client->ClientReferent->find("all", array('conditions'=>array('ClientReferent.id'=>$ids)));
+		foreach ($clientReferents as $cf) {
+			if(isset($cf['Email']) && !empty($cf['Email']))
+				foreach ($cf['Email'] as $em)
+				$email[]=$em;
+		}
+		pr($email);
+		$cr=array();
+		foreach ($client['ClientReferent'] as $clientRef)
+			$cr[$clientRef['id']]=$clientRef['nome']." - ".$clientRef['ruolo'];
+		$emails=array();
+		foreach ($email as $e) {
+			if ($e['foreign_model']=='Client')
+				$index="Mail Aziendale";
+			else
+				$index=$cr[$e['foreign_id']];
+			$emails[$e['email_address']]=$index." - ".$e['email_address'];
+		}
+		
+		$this->set("email", $emails);
+		
+		$this->set("client", $client);
+		
+		$this->loadModel("ClientReferent");
+		
+		$indirizzo=array();
+		foreach ($client['Address'] as $addresses)
+			$indirizzo[$addresses['address']."\n".$addresses['zipcode']." ".$addresses['city']." (".$addresses['province'].") - ".$addresses['nation']]=$addresses['type']." - ".$addresses['address']." ".$addresses['zipcode']." ".$addresses['city']." (".$addresses['province'].") - ".$addresses['nation'];
+		
+		$this->set("addresses", $indirizzo);
+		
+		$referenti=array();
+		foreach ($client['ClientReferent'] as $clientReferent)
+			$referenti[$clientReferent['id']]=$clientReferent['ruolo']." - ".$clientReferent['nome'];
+		
+		$this->set("referenti", $referenti);
+		//die;
+		
+		$creators = $this->Quote->Creator->find('list');
+		$modifiers = $this->Quote->Modifier->find('list');
+		$this->set(compact('creators', 'modifiers'));
+		$this->render('edit');
+	}
+	
 	public function confirm($id = null, $project_id=null) {
 		$this->Quote->id = $id;
 		if (!$this->Quote->exists()) {

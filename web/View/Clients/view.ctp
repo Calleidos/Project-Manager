@@ -21,13 +21,17 @@
 			<?php echo h($client['Client']['partita_iva']); ?>
 			&nbsp;
 		</dd>
+		<dt><?php echo __('Pagamento di default'); ?></dt>
+		<dd>
+			<?php echo h($client['PaymentType']['type']); ?>
+			&nbsp;
+		</dd>
 	</dl>
 </div>
 <div class="actions">
 	<h3><?php echo __('Actions'); ?></h3>
 	<ul>
 		<li><?php echo $this->Html->link(__('Edit Client'), array('action' => 'edit', $client['Client']['id'])); ?> </li>
-		<li><?php echo $this->Form->postLink(__('Delete Client'), array('action' => 'delete', $client['Client']['id']), null, __('Are you sure you want to delete # %s?', $client['Client']['id'])); ?> </li>
 		<li><?php echo $this->Html->link(__('List Clients'), array('action' => 'index')); ?> </li>
 		<li><?php echo $this->Html->link(__('New Client'), array('action' => 'add')); ?> </li>
 	</ul>
@@ -226,6 +230,12 @@
 	<?php endforeach; ?>
 	</table>
 <?php endif; ?>
+	<div class="actions">
+		<ul>
+			<li><?php echo $this->Html->link(__('New Telephone'), array('controller' => 'telephones', 'action' => 'add', $client['Client']['id'], Inflector::classify( $this->params['controller'])));?> </li>
+		</ul>
+	</div>
+</div>
 
 <div class="related">
 	<h3><?php echo __('Related Projects');?></h3>
@@ -257,10 +267,4 @@
 	<?php endforeach; ?>
 	</table>
 <?php endif; ?>
-
-	<div class="actions">
-		<ul>
-			<li><?php echo $this->Html->link(__('New Telephone'), array('controller' => 'telephones', 'action' => 'add', $client['Client']['id'], Inflector::classify( $this->params['controller'])));?> </li>
-		</ul>
-	</div>
 </div>

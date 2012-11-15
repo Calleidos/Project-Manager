@@ -7,7 +7,14 @@ App::uses('AppController', 'Controller');
  */
 class ProjectsController extends AppController {
 
-
+	var $paginate = array(
+		'order' => array(
+			'data' => 'DESC',
+			'id' => 'DESC'
+		),
+	);
+	
+	
 /**
  * index method
  *
@@ -162,4 +169,40 @@ class ProjectsController extends AppController {
 		$this->Session->setFlash(__('Project was not deleted'));
 		$this->redirect(array('action' => 'index'));
 	}
+	
+	public function status ($id=null, $type=null) {
+		$this->Project->id = $id;
+		if (!$this->Project->exists()) {
+			throw new NotFoundException(__('Invalid project'));
+		}
+		
+		if ($this->request->is('post') || $this->request->is('put')) {
+			if ($this->Project->save($this->request->data)) {
+				$this->Session->setFlash(__('The project has been saved'));
+				$this->redirect(array('action' => 'view', $this->request->data['Project']['id']));
+			} else {
+				$this->Session->setFlash(__('The project could not be saved. Please, try again.'));
+			}
+		} else {
+			$this->request->data = $this->Project->read(null, $id);
+		}
+		
+		switch ($type) {
+			case 'invoice_status' :
+				$options=Configure::read("invoiceStatus");
+			break; 
+			case 'ddt_status' :
+				$options=Configure::read("ddtStatus");
+			break;
+			case 'payment_status' :
+				$options=Configure::read("paymentStatus");
+			break;
+		}
+		$this->set('field', $type);
+		$this->set('project_id', $id);
+		$this->set('options', $options);
+		
+	}
+	
+	
 }

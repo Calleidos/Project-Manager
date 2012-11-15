@@ -47,6 +47,10 @@ class ClientsController extends AppController {
 				$this->Session->setFlash(__('The client could not be saved. Please, try again.'));
 			}
 		}
+		$paymentType=$this->Client->PaymentType->find('list', array('fields' => array('id', 'type')));
+		array_unshift($paymentType, "");
+		
+		$this->set("paymenttype", $paymentType);
 		$this->render('edit');
 	}
 
@@ -71,6 +75,10 @@ class ClientsController extends AppController {
 		} else {
 			$this->request->data = $this->Client->read(null, $id);
 		}
+		$paymentType=$this->Client->PaymentType->find('list', array('fields' => array('id', 'type')));
+		array_unshift($paymentType, "");
+		
+		$this->set("paymenttype", $paymentType);
 	}
 
 /**
